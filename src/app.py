@@ -5,11 +5,13 @@ import os
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
+from flask_jwt_extended import JWTManager
 from api.utils import APIException, generate_sitemap
 from api.models import db
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+#from flask_bcrypt import Bcrypt
 
 # from models import Person
 
@@ -18,6 +20,11 @@ static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+
+app.config["JWT_SECRET_KEY"] = os.getenv("FLASK_APP_KEY")
+
+jwt=JWTManager(app)
+#bcrypt=Bcrypt(app)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
