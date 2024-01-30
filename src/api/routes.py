@@ -5,9 +5,11 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-#from app import bcrypt
 from flask_jwt_extended import create_access_token, jwt_required
+from flask_bcrypt import Bcrypt
 
+app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 api = Blueprint('api', __name__)
 
@@ -31,6 +33,7 @@ def user_create():
     password=data["password"]
     user=User()
     user.email=email
+    user.password=bcrypt.generate_password_hash(password,10).decode("utf-8")
     print(data)
     user.password=password
     user.is_active=True
@@ -38,13 +41,14 @@ def user_create():
     db.session.commit()
     return "ok"
 
-@api.route('/login', models=['POST'])
+@api.route('/login', methods=['POST'])
 def user_login():
     data=request.get_json()
     user=User.query.filter_by(email=data['email']).first()
-    if user is None:
-        return jsonify({error: "Usuario no encontrado"}), 401
-    if user.password!=data["password"]
+    #if user is None:
+    if bcrypt.check_password_hash(user.password,data["password"])!=True:
+        return jsonify({"error": "Usuario no encontrado"}), 401
+    if user.password!=data["password"]:
         return jsonify({"error":"Clave inválida"}), 401
     print(user)
     payload={"email":user.email,"nivel": "Administrador"}
