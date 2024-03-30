@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Private = () => {
     const [user, setUser] = useState(null);
@@ -17,7 +17,7 @@ const Private = () => {
 
     // Si el usuario no está autenticado, redirigirlo a la página de inicio de sesión
     if (!user && !loading) {
-        return <Redirect to="/login" />;
+        return <Link to="/login" />;
     }
 
     return (

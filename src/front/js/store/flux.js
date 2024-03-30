@@ -46,7 +46,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
-			}
+			},
+			login: async (email, password) => {
+                try {
+                    const token = "token_de_ejemplo";
+                    sessionStorage.setItem('token', token);
+                    setStore({ isAuthenticated: true });
+                    return true;
+                } catch (error) {
+                    console.log("Error logging in:", error);
+                    return false;
+                }
+            },
+
+            signup: async (email, password) => {
+                try {
+                    return true;
+                } catch (error) {
+                    console.log("Error signing up:", error);
+                    return false;
+                }
+            },
+
+            logout: () => {
+                sessionStorage.removeItem('token');
+                setStore({ isAuthenticated: false });
+            }
 		}
 	};
 };
