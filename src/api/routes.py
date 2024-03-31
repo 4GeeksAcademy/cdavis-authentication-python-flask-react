@@ -27,19 +27,22 @@ def handle_hello():
     return jsonify(response_body), 200
 
 @api.route('/signup', methods=['POST'])
-def user_create():
-    data = request.get_json()
-    email=data["email"]
-    password=data["password"]
-    user=User()
-    user.email=email
-    user.password=bcrypt.generate_password_hash(password,10).decode("utf-8")
-    print(data)
-    user.password=password
-    user.is_active=True
-    db.session.add(user)
-    db.session.commit()
-    return "ok"
+def signup():
+    if request.method == 'POST':
+        data = request.json
+        email = data.get('email')
+        password = data.get('password')
+        if email and password:
+            # Create a new user instance
+            new_user = User(email=email, password=password)
+            db.session.add(new_user)
+            db.session.commit()
+            return jsonify({'message': 'User registered successfully'}), 201
+        else:
+            return jsonify({'error': 'Missing email or password'}), 400
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 @api.route('/login', methods=['POST'])
 def user_login():

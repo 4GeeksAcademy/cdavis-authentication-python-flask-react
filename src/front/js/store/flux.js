@@ -48,30 +48,49 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ demo: demo });
 			},
 			login: async (email, password) => {
+            
+                // Proceso real de autenticación no borrar
+                const actions = getActions();
                 try {
-                    const token = "token_de_ejemplo";
-                    sessionStorage.setItem('token', token);
-                    setStore({ isAuthenticated: true });
-                    return true;
+                    const data = await actions.APIfetch("/login", "POST", { email, password });
+                    if (data.error) {
+                        console.error("Login error:", data.error);
+                        return { success: false, error: data.error }; 
+                    }
+                    setStore({ token: data.token });
+                    localStorage.setItem("accessToken", data.token);
+                    return { success: true }; 
                 } catch (error) {
-                    console.log("Error logging in:", error);
-                    return false;
+                    console.error("Error:", error);
+                    return { success: false, error: "Incorrect credentials" };
                 }
             },
 
             signup: async (email, password) => {
+                const actions = getActions();
                 try {
-                    return true;
-                } catch (error) {
-                    console.log("Error signing up:", error);
+                    const res = await actions.APIfetch("/signup", "POST", {
+                        email, password
+                    });
+                    if (res.error) {
+                        console.error("Error al registrar el usuario:", res.error);
+                        return false;
+                    } else {
+                        console.log("Usuario registrado exitosamente");
+                        return true;
+                    }
+                }
+                catch (error) {
+                    console.error("Error al realizar la petición:", error);
                     return false;
                 }
             },
 
             logout: () => {
-                sessionStorage.removeItem('token');
-                setStore({ isAuthenticated: false });
-            }
+                setStore({ token: null });
+                localStorage.removeItem('accessToken');
+            },
+			
 		}
 	};
 };
