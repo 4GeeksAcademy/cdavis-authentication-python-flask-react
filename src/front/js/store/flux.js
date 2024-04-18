@@ -90,6 +90,23 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ token: null });
                 localStorage.removeItem('accessToken');
             },
+			APIfetch: async (endpoint, method = "GET", body = null) => {
+                const backendURL = process.env.BACKEND_URL || "http://localhost:5000";
+
+                const params = { method, headers: {} };
+                if (body) {
+                    params.headers["Content-Type"] = "application/json";
+                    params.body = JSON.stringify(body);
+                }
+                try {
+                    const res = await fetch(`${backendURL}api${endpoint}`, params);
+                    if (!res.ok) throw new Error(res.statusText);
+                    return await res.json();
+                } catch (error) {
+                    console.error("Error fetching data durign login:", error);
+                    throw error;
+                }
+            },
 			
 		}
 	};
